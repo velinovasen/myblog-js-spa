@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles/style.css">
+  <script src="./node_modules/handlebars/dist/handlebars.min.js"></script>
+  <script src="router.js" defer></script>
+  <script src="init.js" defer></script>
+  <script src="services.js" defer></script>
+  <title>MyBlog</title>
+</head>
+
+
+<body>
+  <div id="root">
+    <div id="header-element"></div>
+    <div id="root-main"></div>
+  </div>
+
+
+  <script type="text/x-handlebars-template" id="navbar">
+      <!-- Header -->
+    <header id="header">
+      <h1>MyBlog</h1>
+      {{#if isAuth}}
+      <h2>Welcome <span>{{email}}</span>!</h2>
+      {{/if}}
+      <nav id="nav">
+        <ul>
+          {{#if isAuth}}
+          <li><a href="/logout" onclick="logoutButton(event)">Logout</a></li>
+          {{else}}
+          <li><a href="/home" onclick="homeButton(event)">Home</a></li>
+          <li><a href="/login" onclick="loginNowButton(event)">Login</a></li>
+          <li><a href="/register" onclick="registerNowButton(event)">Register</a></li>
+          {{/if}}
+        </ul>
+      </nav>
+    </header>
+  </script>
+
+ 
+  <script type="text/x-handlebars-template" id="login-template">
+      <!-- Login -->
+    <section id="login">
+      <div class="color">
+        <div class="login-form">
+          <h1>Login</h1>
+          <form action="/login" method="POST" id="form">
+            <label for="email">Email</label>
+            <input type="text" name="email" id="email-login-input">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password-login-input">
+            <button onclick="loginSubmitButton(event)">Submit</button>
+            <a href="/register" class="option" onclick="registerNowButton(event)">Don't have an account?</a>
+          </form>
+        </div>
+      </div>
+    </section>
+  </script>
+
+  <script type="text/x-handlebars-template" id="register-template">
+      <!-- Register -->
+    <section id="register">
+      <div class="color">
+        <div class="register-form">
+          <h1>Register</h1>
+          <form action="/register" method="POST" id="form">
+            <label for="email">Email</label>
+            <input type="text" name="email" id="email-register-input">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password-register-input">
+            <label for="repeat-password">Repeat Password</label>
+            <input type="password" name="repeatPassword" id="password2-register-input">
+            <button onclick="registerSubmitButton(event)">Submit</button>
+            <a href="/login" class="option" onclick="loginNowButton(event)">Already have an account?</a>
+          </form>
+        </div>
+      </div>
+    </section>
+  </script>
+
+  <script type="text/x-handlebars-template" id="details-template">
+      <!-- Details -->
+    <section class="details">
+      <div class="detail">
+        <h1>Title: {{title}}</h1>
+        <h2>Category: {{category}}</h2>
+        <h3>Content: {{content}}</h3>
+        <a href="/home" onclick="homeButton(event)">Back to Home</a>
+      </div>
+    </section>
+  </script>
+
+  <script type="text/x-handlebars-template" id="edit-article">
+      <!-- Edit -->
+    <main id="home-logged">
+
+
+    </main>
+  </script>
+
+  <script type="text/x-handlebars-template" id="home-template">
+      <!-- Home -->
+    {{#if isAuth}}
+    <section id="home-logged">
+      <section class="first-section">
+        <section class="background-container">
+          <form action="/create-post" method="POST">
+            <h1>Create Post</h1>
+            <label for="title">Title</label>
+            <input type="text" name="title" id="title-input">
+            <label for="category">Category</label>
+            <input type="text" name="category" id="category-input">
+            <label for="content">Content</label>
+            <textarea name="content" cols="30" rows="7" id="content-input"></textarea>
+            <button onclick="createItemButton(event)">Submit</button>
+          </form>
+        </section>
+      </section>
+      <section class="second-section">
+        <h3>Articles</h3>
+        <hr>
+        <section class="first-section" id="toggle-edit" style="display: none;">
+          <section class="background-container">
+            <form action="" method="" class="edit-form">
+              <h1>Edit Post</h1>
+              <label for="title">Title</label>
+              <input type="text" name="title" id="title-edit-input">
+              <label for="category">Category</label>
+              <input type="text" name="category" id="category-edit-input">
+              <label for="content">Content</label>
+              <textarea name="content" cols="30" rows="7" id="content-edit-input">{{content}}</textarea>
+              <button onclick="editItemButtonSubmit(event)" class="edit-submit-button">Edit</button>
+              <a id="close-btn" href="/home"><img src="../../images/close.png" onclick="homeButton(event)"></a>
+            </form>
+          </section>
+        </section>
+        {{#if hasItems}}
+        {{#each items}}
+        <article class="post">
+          <h1 class="title-data-for-edit">{{title}}</h1>
+          <h2><span class="category-data-for-edit">{{category}}</span></h2>
+          <p class="content-data-for-edit">{{content}}</p>
+          {{#if owner}}
+          <a href="/delete" id="delete-button" class="{{key}}" onclick="deleteItem(event)">Delete</a>
+          <a href="/details" id="details-button" class="{{key}}" onclick="detailsButton(event)">Details</a>
+          <a href="/edit" id="edit-button" class="{{key}}" onclick="editItem(event)">Edit</a>
+          {{else}}
+          <a href="/details" id="details-button" class="{{key}}" onclick="detailsButton(event)">Details</a>
+
+          {{/if}}
+        </article>
+        {{/each}}
+        {{/if}}
+        <div class="posts-row">
+        </div>
+      </section>
+    </section>
+    {{else}}
+    <section id="home">
+      <section class="background-container">
+        <h1>Welcome to MyBlog!</h1>
+        <div class="auth-buttons">
+          <a href="/login" onclick="loginNowButton(event)">Login</a>
+          <a href="/register" onclick="registerNowButton(event)">Register</a>
+        </div>
+      </section>
+    </section>
+    {{/if}}
+  </script>
+
+</body>
+
+</html>
